@@ -1,0 +1,10 @@
+module {CCO.ExWhile.AG} {}
+{
+import CCO.Component
+}
+
+include "AG/Base.ag"
+
+{
+
+}

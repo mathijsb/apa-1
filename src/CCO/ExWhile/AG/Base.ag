@@ -1,0 +1,45 @@
+imports
+{
+import CCO.SourcePos
+}
+
+-------------------------------------------------------------------------------
+-- Syntax
+-------------------------------------------------------------------------------
+
+{
+
+type Label = String
+
+type Var = String
+
+data IntOp    = Plus | Minus -- | Times | DivideBy | Modulo
+  deriving Show
+
+data BoolOp   = And | Or -- | Nand | Xor
+  deriving Show
+data IntComp  = EQ | LT | LTE | GT | GTE
+  deriving Show
+
+data IntExpr  = IEInt  Integer
+              | IEVar  Var
+              | IEOp   IntExpr  IntOp  IntExpr
+
+data BoolExpr = BEBool  Bool
+              | BENot   BoolExpr
+              | BEOp    BoolExpr  BoolOp    BoolExpr
+              | BEInt   IntExpr   IntComp   IntExpr
+
+}
+
+data Stmnt
+  | Stmnt  pos :: {SourcePos}  t :: Stmnt_
+
+type StmntL = [Stmnt]
+
+data Stmnt_
+  | Assgn      x :: {Var}  ie :: {IntExpr}
+  | IfThenElse cond :: {BoolExpr}  thenBody :: Stmnt  elseBody :: Stmnt
+  | While      cond :: {BoolExpr}  body :: Stmnt
+  | Skip
+  | StmntL     ss :: StmntL
