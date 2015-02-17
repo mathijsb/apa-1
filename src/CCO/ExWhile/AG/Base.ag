@@ -38,8 +38,9 @@ data Stmnt
 type StmntL = [Stmnt]
 
 data Stmnt_
+  | RootSet    ss :: StmntL
+  | StmntL     ss :: StmntL
   | Assgn      x :: {Var}  ie :: {IntExpr}
   | IfThenElse cond :: {BoolExpr}  thenBody :: Stmnt  elseBody :: Stmnt
   | While      cond :: {BoolExpr}  body :: Stmnt
   | Skip
-  | StmntL     ss :: StmntL

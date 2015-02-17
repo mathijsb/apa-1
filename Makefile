@@ -19,6 +19,9 @@ clean :
 	rm -rf dist
 	rm -rf bin
 
+repl : haskell
+	cabal repl
+
 sandbox:
 	cabal sandbox init
 	cabal install --dependencies-only

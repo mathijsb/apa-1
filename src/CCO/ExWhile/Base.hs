@@ -7,8 +7,8 @@ module CCO.ExWhile.Base (
   , IntComp (EQ, LT, LTE, GT, GTE)
   , IntExpr (IEInt, IEVar, IEOp)
   , BoolExpr (BEBool, BENot, BEOp, BEInt)
-  , Stmnt (Stmnt)                                    -- instances: Tree
-  , Stmnt_ (Assgn, IfThenElse, While, Skip, StmntL)  -- instances: Tree
+  , Stmnt (Stmnt)
+  , Stmnt_ (RootSet, StmntL, Assgn, IfThenElse, While, Skip)
 ) where
 
 import Prelude hiding (EQ, LT, LTE, GT, GTE)
@@ -27,6 +27,7 @@ instance Tree Stmnt where
   toTree = parseTree [app "Stmnt" (Stmnt <$> arg <*> arg)]
 
 instance Tree Stmnt_ where
+  fromTree (RootSet ss)     = T.App "RootSet" [ fromTree ss ]
   fromTree (Assgn x ie)     = T.App "Assgn" [ fromTree x
                                             , fromTree ie ]
   fromTree (IfThenElse cond thenBody elseBody)
@@ -39,7 +40,8 @@ instance Tree Stmnt_ where
   fromTree (Skip)           = T.App "Skip" [ ]
   fromTree (StmntL ss)      = T.App "StmntL" [ fromTree ss ]
 
-  toTree = parseTree [ app "Assgn"      (Assgn      <$> arg <*> arg)
+  toTree = parseTree [ app "RootSet"    (RootSet    <$> arg)
+                     , app "Assgn"      (Assgn      <$> arg <*> arg)
                      , app "IfThenElse" (IfThenElse <$> arg <*> arg <*> arg)
                      , app "While"      (While      <$> arg <*> arg)
                      , app "Skip"       (pure Skip)

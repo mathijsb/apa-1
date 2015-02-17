@@ -111,14 +111,19 @@ sem_StmntL_Nil =
              _self
      in  ( _lhsOself))
 -- Stmnt_ ------------------------------------------------------
-data Stmnt_ = Assgn (Var) (IntExpr)
+data Stmnt_ = RootSet (StmntL)
+            | StmntL (StmntL)
+            | Assgn (Var) (IntExpr)
             | IfThenElse (BoolExpr) (Stmnt) (Stmnt)
             | While (BoolExpr) (Stmnt)
             | Skip
-            | StmntL (StmntL)
 -- cata
 sem_Stmnt_ :: Stmnt_ ->
               T_Stmnt_
+sem_Stmnt_ (RootSet _ss) =
+    (sem_Stmnt__RootSet (sem_StmntL _ss))
+sem_Stmnt_ (StmntL _ss) =
+    (sem_Stmnt__StmntL (sem_StmntL _ss))
 sem_Stmnt_ (Assgn _x _ie) =
     (sem_Stmnt__Assgn _x _ie)
 sem_Stmnt_ (IfThenElse _cond _thenBody _elseBody) =
@@ -127,8 +132,6 @@ sem_Stmnt_ (While _cond _body) =
     (sem_Stmnt__While _cond (sem_Stmnt _body))
 sem_Stmnt_ (Skip) =
     (sem_Stmnt__Skip)
-sem_Stmnt_ (StmntL _ss) =
-    (sem_Stmnt__StmntL (sem_StmntL _ss))
 -- semantic domain
 type T_Stmnt_ = ( Stmnt_)
 data Inh_Stmnt_ = Inh_Stmnt_ {}
@@ -139,6 +142,30 @@ wrap_Stmnt_ :: T_Stmnt_ ->
 wrap_Stmnt_ sem (Inh_Stmnt_) =
     (let ( _lhsOself) = sem
      in  (Syn_Stmnt_ _lhsOself))
+sem_Stmnt__RootSet :: T_StmntL ->
+                      T_Stmnt_
+sem_Stmnt__RootSet ss_ =
+    (let _lhsOself :: Stmnt_
+         _ssIself :: StmntL
+         _self =
+             RootSet _ssIself
+         _lhsOself =
+             _self
+         ( _ssIself) =
+             ss_
+     in  ( _lhsOself))
+sem_Stmnt__StmntL :: T_StmntL ->
+                     T_Stmnt_
+sem_Stmnt__StmntL ss_ =
+    (let _lhsOself :: Stmnt_
+         _ssIself :: StmntL
+         _self =
+             StmntL _ssIself
+         _lhsOself =
+             _self
+         ( _ssIself) =
+             ss_
+     in  ( _lhsOself))
 sem_Stmnt__Assgn :: Var ->
                     IntExpr ->
                     T_Stmnt_
@@ -186,16 +213,4 @@ sem_Stmnt__Skip =
              Skip
          _lhsOself =
              _self
-     in  ( _lhsOself))
-sem_Stmnt__StmntL :: T_StmntL ->
-                     T_Stmnt_
-sem_Stmnt__StmntL ss_ =
-    (let _lhsOself :: Stmnt_
-         _ssIself :: StmntL
-         _self =
-             StmntL _ssIself
-         _lhsOself =
-             _self
-         ( _ssIself) =
-             ss_
      in  ( _lhsOself))

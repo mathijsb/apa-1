@@ -1,1 +1,10 @@
-x := 2
+skip;skip;
+{
+  skip;
+  x := 3;
+  if (true) then skip; else skip;
+  while (true) do {
+    skip;
+    skip;
+  }
+}
