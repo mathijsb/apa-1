@@ -1,8 +1,8 @@
 skip;skip;
 {
   skip;
-  x := 3;
-  if (true) then skip; else skip;
+  x := (3 + 4);
+  if (x == 7) then x := 1;
   while (true) do {
     skip;
     skip;

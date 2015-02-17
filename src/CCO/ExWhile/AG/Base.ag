@@ -41,6 +41,7 @@ data Stmnt_
   | RootSet    ss :: StmntL
   | StmntL     ss :: StmntL
   | Assgn      x :: {Var}  ie :: {IntExpr}
+  | IfThen     cond :: {BoolExpr}  body :: Stmnt
   | IfThenElse cond :: {BoolExpr}  thenBody :: Stmnt  elseBody :: Stmnt
   | While      cond :: {BoolExpr}  body :: Stmnt
   | Skip
