@@ -12,11 +12,12 @@ import CCO.SourcePos
 type Label = String
 
 type Var = String
+type VarL = [Var]
 
-data IntOp    = Plus | Minus -- | Times | DivideBy | Modulo
+data IntOp    = Plus | Minus | Times | Div | Modulo
   deriving Show
 
-data BoolOp   = And | Or -- | Nand | Xor
+data BoolOp   = And | Or | Nand | Xor
   deriving Show
 data IntComp  = EQ | LT | LTE | GT | GTE
   deriving Show
@@ -32,16 +33,22 @@ data BoolExpr = BEBool  Bool
 
 }
 
+data Proc
+  | Proc  name :: {Var}  args :: {VarL}  refs :: {VarL}  body :: Stmnt
+
+type ProcL = [Proc]
+
 data Stmnt
   | Stmnt  pos :: {SourcePos}  t :: Stmnt_
 
 type StmntL = [Stmnt]
 
 data Stmnt_
-  | RootSet    ss :: StmntL
-  | StmntL     ss :: StmntL
-  | Assgn      x :: {Var}  ie :: {IntExpr}
-  | IfThen     cond :: {BoolExpr}  body :: Stmnt
-  | IfThenElse cond :: {BoolExpr}  thenBody :: Stmnt  elseBody :: Stmnt
-  | While      cond :: {BoolExpr}  body :: Stmnt
+  | RootSet     procs :: ProcL  ss :: StmntL
+  | StmntL      ss :: StmntL
+  | Assgn       x :: {Var}  ie :: {IntExpr}
+  | IfThen      cond :: {BoolExpr}  body :: Stmnt
+  | IfThenElse  cond :: {BoolExpr}  thenBody :: Stmnt  elseBody :: Stmnt
+  | While       cond :: {BoolExpr}  body :: Stmnt
   | Skip
+

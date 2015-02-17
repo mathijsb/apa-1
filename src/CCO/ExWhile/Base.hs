@@ -1,14 +1,15 @@
 module CCO.ExWhile.Base (
     -- * Syntax
     Label
-  , Var
-  , IntOp (Plus, Minus)
-  , BoolOp (And, Or)
-  , IntComp (EQ, LT, LTE, GT, GTE)
-  , IntExpr (IEInt, IEVar, IEOp)
-  , BoolExpr (BEBool, BENot, BEOp, BEInt)
-  , Stmnt (Stmnt)
-  , Stmnt_ (RootSet, StmntL, Assgn, IfThen, IfThenElse, While, Skip)
+  , Var, VarL
+  , IntOp (..)
+  , BoolOp (..)
+  , IntComp (..)
+  , IntExpr (..)
+  , BoolExpr (..)
+  , Proc (..)
+  , Stmnt (..)
+  , Stmnt_ (..)
 ) where
 
 import Prelude hiding (EQ, LT, LTE, GT, GTE)
@@ -27,7 +28,10 @@ instance Tree Stmnt where
   toTree = parseTree [app "Stmnt" (Stmnt <$> arg <*> arg)]
 
 instance Tree Stmnt_ where
-  fromTree (RootSet ss)     = T.App "RootSet" [ fromTree ss ]
+  fromTree (RootSet procs ss)
+                            = T.App "RootSet" [ fromTree procs
+                                              , fromTree ss ]
+  fromTree (StmntL ss)      = T.App "StmntL" [ fromTree ss ]
   fromTree (Assgn x ie)     = T.App "Assgn" [ fromTree x
                                             , fromTree ie ]
   fromTree (IfThen cond body)
@@ -41,16 +45,24 @@ instance Tree Stmnt_ where
                             = T.App "While" [ fromTree cond
                                             , fromTree body ]
   fromTree (Skip)           = T.App "Skip" [ ]
-  fromTree (StmntL ss)      = T.App "StmntL" [ fromTree ss ]
 
-  toTree = parseTree [ app "RootSet"    (RootSet    <$> arg)
+  toTree = parseTree [ app "RootSet"    (RootSet    <$> arg <*> arg)
+                     , app "StmntL"     (StmntL     <$> arg)
                      , app "Assgn"      (Assgn      <$> arg <*> arg)
                      , app "IfThen"     (IfThen     <$> arg <*> arg)
                      , app "IfThenElse" (IfThenElse <$> arg <*> arg <*> arg)
                      , app "While"      (While      <$> arg <*> arg)
                      , app "Skip"       (pure Skip)
-                     , app "StmntL"     (StmntL     <$> arg)
                      ]
+
+instance Tree Proc where
+  fromTree (Proc name args refs body)
+                            = T.App "Proc" [ fromTree name
+                                           , fromTree args
+                                           , fromTree refs
+                                           , fromTree body]
+
+  toTree = parseTree [ app "Proc" (Proc <$> arg <*> arg <*> arg <*> arg) ]
 
 instance Tree IntExpr where
   fromTree (IEInt i)     = T.App "IntExpr:Int" [fromTree i]
@@ -75,19 +87,29 @@ instance Tree BoolExpr where
                      ]
 
 instance Tree IntOp where
-  fromTree Plus  = T.App "Plus" []
-  fromTree Minus = T.App "Minus" []
+  fromTree Plus   = T.App "Plus" []
+  fromTree Minus  = T.App "Minus" []
+  fromTree Times  = T.App "Times" []
+  fromTree Div    = T.App "Div" []
+  fromTree Modulo = T.App "Modulo" []
 
-  toTree = parseTree [ app "Plus"  (pure Plus)
-                     , app "Minus" (pure Minus)
+  toTree = parseTree [ app "Plus"   (pure Plus)
+                     , app "Minus"  (pure Minus)
+                     , app "Times"  (pure Times)
+                     , app "Div"    (pure Div)
+                     , app "Modulo" (pure Modulo)
                      ]
 
 instance Tree BoolOp where
-  fromTree And = T.App "And" []
-  fromTree Or  = T.App "Or" []
+  fromTree And  = T.App "And" []
+  fromTree Or   = T.App "Or" []
+  fromTree Nand = T.App "Nand" []
+  fromTree Xor  = T.App "Xor" []
 
-  toTree = parseTree [ app "And" (pure And)
-                     , app "Or"  (pure Or)
+  toTree = parseTree [ app "And"  (pure And)
+                     , app "Or"   (pure Or)
+                     , app "Nand" (pure Nand)
+                     , app "Xor"  (pure Xor)
                      ]
 
 instance Tree IntComp where

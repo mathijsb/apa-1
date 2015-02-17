@@ -94,6 +94,7 @@ keyword_ = fmap Keyword $ string "if" <|> string "then" <|> string "else"
                       <|> string "while" <|> string "do"
                       <|> string "skip"
                       <|> string "true" <|> string "false"
+                      <|> string "proc" <|> string "arg" <|> string "ref" <|> string "is" <|> string "end"
 
 -- | A 'Lexer' that recognises 'Var' tokens.
 var_ :: Lexer Token
@@ -109,7 +110,7 @@ str_ =  Str <$ char '"' <*> many (anyCharBut "\"") <* char '"'
 
 -- | A 'Lexer' that recognises 'Spec' tokens.
 spec_ :: Lexer Token
-spec_ = Spec <$> anyCharFrom "{};():=+-*/%<>&|"
+spec_ = Spec <$> anyCharFrom ";():=+-*/%<>&|,"
 
 -- | The 'Lexer' for the language.
 lexer :: Lexer Token
