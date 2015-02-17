@@ -69,7 +69,7 @@ pStmnt = pStmnt' <* many (spec ';')
 
 pStmnt' :: TokenParser Stmnt
 pStmnt' = (\pos s ss                     -> Stmnt pos (StmntL (s:ss))) <$>
-            sourcePos <* spec '{' <*> pStmnt <*> many (spec ';' *> pStmnt) <* spec '}'
+            sourcePos <* spec '(' <*> pStmnt <*> many (spec ';' *> pStmnt) <* spec ')'
       <|> (\pos x ie                     -> Stmnt pos (Assgn x ie)) <$>
             sourcePos <*> var <* spec ':' <* spec '=' <*> pIntExpr
       <|> (\pos                          -> Stmnt pos (Skip)) <$>
