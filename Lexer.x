@@ -20,8 +20,12 @@ tokens :-
   \)                              { tok (\p s -> ParensClose p) }
   \;                              { tok (\p s -> Semicolon p) }
 
+  \<                              { tok (\p s -> TLT p) }
+  \>                              { tok (\p s -> TGT p) }
+  \&\&                            { tok (\p s -> TAND p) }
+
   $digit+                         { tok (\p s -> Int p (read s)) }
-  [\=\+\-\*\/\<\>]                { tok (\p s -> Sym p (head s)) }
+  [\=\+\-\*\/]                    { tok (\p s -> Sym p (head s)) }
   $alpha [$alpha $digit \_ \']*   { tok (\p s -> Var p s) }
 
 {
@@ -42,7 +46,10 @@ data Token =
   Assign AlexPosn |
   Sym AlexPosn Char |
   Var AlexPosn String |
-  Int AlexPosn Int
+  Int AlexPosn Int |
+  TLT AlexPosn |
+  TGT AlexPosn |
+  TAND AlexPosn
   deriving (Eq,Show)
 
 token_posn (While p) = p
@@ -56,5 +63,8 @@ token_posn (BracketOpen p) = p
 token_posn (BracketClose p) = p
 token_posn (ParensOpen p) = p
 token_posn (ParensClose p) = p
+token_posn (TLT p) = p
+token_posn (TGT p) = p
+token_posn (TAND p) = p
 
 }

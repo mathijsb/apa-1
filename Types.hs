@@ -36,6 +36,6 @@ data Stm
   | Sskip
   | Scomp Stm Stm
   | Sif Bexp Stm Stm
-  | Swhile Bexp Stm
+  | Swhile Bexp [Stm]
   | Stry Stm Stm
   deriving (Show, Eq)
