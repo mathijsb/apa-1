@@ -49,6 +49,7 @@ pSimpleIntExpr = (\i -> IEInt i) <$> nat
 -- | Parses a 'BoolExpr'.
 pBoolExpr :: TokenParser BoolExpr
 pBoolExpr = pSimpleBoolExpr
+        <|> spec '(' *> pBoolExpr <* spec ')'
         <|> (\a b -> BEOp a And b) <$> pSimpleBoolExpr <* keyword "and" <*> pBoolExpr
         <|> (\a b -> BEOp a Or b) <$> pSimpleBoolExpr <* keyword "or" <*> pBoolExpr
 
@@ -60,24 +61,26 @@ pSimpleBoolExpr = (BEBool True) <$ keyword "true"
 
 -- | Parses a 'Stmnt'.
 pRootStmnt :: TokenParser Stmnt
-pRootStmnt = (\pos ss -> Stmnt pos (RootSet ss)) <$> sourcePos <*> some pStmnt
+pRootStmnt = (\pos s ss -> Stmnt pos (RootSet (s:ss))) <$>
+               sourcePos <*> pStmnt <*> many (spec ';' *> pStmnt)
 
 pStmnt :: TokenParser Stmnt
-pStmnt = (\pos ss                       -> Stmnt pos (StmntL ss)) <$>
-           sourcePos <* spec '{' <*> many pStmnt <* spec '}'
-     <|> (\pos ss                       -> Stmnt pos (StmntL ss)) <$>
-           sourcePos <* spec '{' <*> many pStmnt <* spec '}'
-     <|> (\pos x ie                     -> Stmnt pos (Assgn x ie)) <$>
-           sourcePos <*> var <* spec ':' <* spec '=' <*> pIntExpr <* spec ';'
-     <|> (\pos                          -> Stmnt pos (Skip)) <$>
-           sourcePos <* keyword "skip" <* spec ';'
-     <|> (\pos cond thenBody elseBody   -> Stmnt pos (IfThenElse cond thenBody elseBody)) <$>
-           sourcePos <* keyword "if" <* spec '(' <*> pBoolExpr <* spec ')' <*
-           keyword "then" <*> pStmnt <*
-           keyword "else" <*> pStmnt
-     <|> (\pos cond body                -> Stmnt pos (IfThen cond body)) <$>
-           sourcePos <* keyword "if" <* spec '(' <*> pBoolExpr <* spec ')' <*
-           keyword "then" <*> pStmnt
-     <|> (\pos cond body                -> Stmnt pos (While cond body)) <$>
-           sourcePos <* keyword "while" <* spec '(' <*> pBoolExpr <* spec ')' <*
-           keyword "do" <*> pStmnt
+pStmnt = pStmnt' <* many (spec ';')
+
+pStmnt' :: TokenParser Stmnt
+pStmnt' = (\pos s ss                     -> Stmnt pos (StmntL (s:ss))) <$>
+            sourcePos <* spec '{' <*> pStmnt <*> many (spec ';' *> pStmnt) <* spec '}'
+      <|> (\pos x ie                     -> Stmnt pos (Assgn x ie)) <$>
+            sourcePos <*> var <* spec ':' <* spec '=' <*> pIntExpr
+      <|> (\pos                          -> Stmnt pos (Skip)) <$>
+            sourcePos <* keyword "skip"
+      <|> (\pos cond thenBody elseBody   -> Stmnt pos (IfThenElse cond thenBody elseBody)) <$>
+            sourcePos <* keyword "if" <*> pBoolExpr <*
+            keyword "then" <*> pStmnt <*
+            keyword "else" <*> pStmnt
+      <|> (\pos cond body                -> Stmnt pos (IfThen cond body)) <$>
+            sourcePos <* keyword "if" <*> pBoolExpr <*
+            keyword "then" <*> pStmnt
+      <|> (\pos cond body                -> Stmnt pos (While cond body)) <$>
+            sourcePos <* keyword "while" <*> pBoolExpr <*
+            keyword "do" <*> pStmnt

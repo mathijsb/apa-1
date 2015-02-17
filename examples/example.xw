@@ -3,7 +3,7 @@ skip;skip;
   skip;
   x := (3 + 4);
   if (x == 7) then x := 1;
-  while (true) do {
+  while true do {
     skip;
     skip;
   }
